@@ -1,10 +1,13 @@
 ------------------------------------------------------------------
 -- Name        : modulo_cnt.vhd
 -- Description : Modulo counter
--- Designed by : Claudio Avi Chami - FPGA Site
---               http://fpgasite.net
--- Date        : 04/October/2016
--- Version     : 01
+-- Designed by : Claudio Avi Chami - FPGA'er website
+--               http://fpgaer.tech
+-- Date        : 14/August/2022
+-- Version     : 02
+-- 
+-- History     : 01- Initial version
+--             : 02- Recoded according Xilinx recommendations
 ------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -34,7 +37,7 @@ architecture rtl of modulo_cnt is
 
 begin 
 zero_i   <= '1' when cnt = 0 else '0';
-zero  <= zero_i;
+zero     <= zero_i;
 
 counter_pr: process (clk, rst) 
    begin 
