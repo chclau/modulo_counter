@@ -1,8 +1,0 @@
-This folder includes all the Modelsim files:
-  
-  project for Modelsim altera (.mpf file)
-  
-  wave.do
-  
-  etc.
-  
