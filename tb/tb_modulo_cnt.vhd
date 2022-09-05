@@ -1,9 +1,10 @@
+
 ------------------------------------------------------------------
 -- Name        : tb_modulo_cnt.vhd
 -- Description : Testbench for modulo counter
 -- Designed by : Claudio Avi Chami - FPGA Site
---               http://fpgasite.net
--- Date        : 04/October/2016
+--               http://fpgaer.tech
+-- Date        : 05/September/2022
 -- Version     : 01
 ------------------------------------------------------------------
 library ieee;
@@ -56,8 +57,8 @@ begin
    process 
    begin
       
-      wait for 100 ns;
       mod_int <= 12;
+      wait for 100 ns;
       wait until (clk = '0');
       rst <= '0';
 
