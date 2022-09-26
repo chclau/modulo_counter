@@ -36,7 +36,7 @@ ARCHITECTURE test OF tb_modulo_cnt IS
       rst     : IN  STD_LOGIC;
 
       -- inputs
-      max_cnt : IN  STD_LOGIC_VECTOR (DATA_W - 1 DOWNTO 0);
+      max_cnt : IN  STD_LOGIC_VECTOR;
       en      : IN  STD_LOGIC;
 
       -- outputs
