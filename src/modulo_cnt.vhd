@@ -1,55 +1,58 @@
-
 ------------------------------------------------------------------
 -- Name        : modulo_cnt.vhd
 -- Description : Modulo counter
 -- Designed by : Claudio Avi Chami - FPGA'er website
 --               http://fpgaer.tech
--- Date        : 14/August/2022
--- Version     : 02
+-- Date        : 24/September/2022
+-- Version     : 03
 -- 
 -- History     : 01- Initial version
 --             : 02- Recoded according Xilinx recommendations
+--             : 03- Simplified using recommendations given on Reddit
 ------------------------------------------------------------------
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
 
-entity modulo_cnt is
-   generic (
-      DATA_W   : natural := 32
-   );
-   port (
-      clk:     in std_logic;
-      rst:     in std_logic;
-      
-      -- inputs
-      max_cnt: in std_logic_vector (DATA_W-1 downto 0);
-      en:      in std_logic;
+ENTITY modulo_cnt IS
+  PORT (
+    clk     : IN  STD_LOGIC;
+    rst     : IN  STD_LOGIC;
 
-      -- outputs
-      zero:    out std_logic
-   );
-end modulo_cnt;
+    -- inputs
+    max_cnt : IN  STD_LOGIC_VECTOR;
+    en      : IN  STD_LOGIC;
 
-architecture rtl of modulo_cnt is
-   signal   cnt      : unsigned(DATA_W-1 downto 0);
+    -- outputs
+    zero    : OUT STD_LOGIC
+  );
+END modulo_cnt;
+ARCHITECTURE rtl OF modulo_cnt IS
+  SIGNAL cnt : unsigned(max_cnt'left DOWNTO 0);
+  SIGNAL zero_i : STD_LOGIC;
 
-begin 
-  zero  <= '1' when cnt = 0 else '0';
+BEGIN
+  -- zero_i <= '1' when cnt = 0 else '0'; 
 
-  counter_pr: process (clk) 
-  begin
-    if (rising_edge(clk)) then   
-      if (rst = '1') then 
-        cnt  <= (others => '0');
-      elsif (en = '1') then            -- is counting enabled?
-        if (zero = '1') then         -- check if counter reached zero
-          cnt   <= unsigned(max_cnt) - 1;   -- reload with modulo_value-1
-        else
-          cnt   <= cnt - 1;       -- decrement counter
-        end if;  
-      end if;  
-    end if;
-  end process counter_pr;
+  counter_pr : PROCESS (clk)
+  BEGIN
+    IF (rising_edge(clk)) THEN
+      IF (rst = '1') THEN
+        cnt <= unsigned(max_cnt) - 1;
+        zero <= '0';
+      ELSIF (en = '1') THEN             -- is counting enabled?
+        IF (cnt = 1) THEN               -- Use pipeline to assert zero
+          zero <= '1';                  -- together with cnt=0
+        ELSE
+          zero <= '0';
+        END IF;
+        IF (zero = '1') THEN            -- check if counter reached zero
+          cnt <= unsigned(max_cnt) - 1; -- reload with modulo_value-1
+        ELSE
+          cnt <= cnt - 1;               -- decrement counter
+        END IF;
+      END IF;
+    END IF;
+  END PROCESS counter_pr;
 
-end rtl;
+END rtl;
