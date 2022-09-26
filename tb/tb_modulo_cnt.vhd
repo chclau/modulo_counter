@@ -1,4 +1,3 @@
-
 ------------------------------------------------------------------
 -- Name        : tb_modulo_cnt.vhd
 -- Description : Testbench for modulo counter
@@ -7,109 +6,101 @@
 -- Date        : 05/September/2022
 -- Version     : 01
 ------------------------------------------------------------------
-library ieee;
-   use ieee.std_logic_1164.all;
-   use ieee.std_logic_textio.all;
-   use ieee.numeric_std.ALL;
-   use std.textio.all;
-    
-entity tb_modulo_cnt is
-end entity;
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.std_logic_textio.ALL;
+USE ieee.numeric_std.ALL;
+USE std.textio.ALL;
 
-architecture test of tb_modulo_cnt is
+ENTITY tb_modulo_cnt IS
+END ENTITY;
 
-   constant DATA_W         : natural   := 8                           ; 
-   constant CLK_FREQ       : natural   := 80                          ; -- in MHz
-   constant CLK_PER        : natural   := 1000000 / CLK_FREQ          ; -- in ps
-   constant clk_period     : time      := CLK_PER * 1 ps              ;
-   
-   signal clk        : std_logic := '0';
-   signal rst        : std_logic := '1';
-   signal en         : std_logic := '0';
-   signal modulo     : std_logic_vector(DATA_W-1 downto 0);
-   signal mod_int    : integer;
-   
-   signal endSim     : boolean   := false;
+ARCHITECTURE test OF tb_modulo_cnt IS
 
-   component modulo_cnt  is
-      generic (
-         DATA_W     : natural := 32
-      );
-      port (
-         clk:        in std_logic;
-         rst:        in std_logic;
-         
-         -- inputs
-         max_cnt:    in std_logic_vector (DATA_W-1 downto 0);
-         en:         in std_logic;
+  CONSTANT DATA_W : NATURAL := 8;
+  CONSTANT CLK_FREQ : NATURAL := 100; -- in MHz
+  CONSTANT CLK_PER : NATURAL := 1000000 / CLK_FREQ; -- in ps
+  CONSTANT clk_period : TIME := CLK_PER * 1 ps;
 
-         -- outputs
-         zero:       out std_logic
-      );
-   end component;
+  SIGNAL clk : STD_LOGIC := '0';
+  SIGNAL rst : STD_LOGIC := '1';
+  SIGNAL en : STD_LOGIC := '0';
+  SIGNAL modulo : STD_LOGIC_VECTOR(DATA_W - 1 DOWNTO 0);
+  SIGNAL mod_int : INTEGER;
 
+  SIGNAL endSim : BOOLEAN := false;
 
-begin
-   clk     <= not clk after clk_period/2;
-   modulo  <= std_logic_vector(to_unsigned(mod_int, modulo'length));
+  COMPONENT modulo_cnt IS
+    PORT (
+      clk     : IN  STD_LOGIC;
+      rst     : IN  STD_LOGIC;
 
-   -- Main simulation process
-   process 
-   begin
-      
-      mod_int <= 12;
-      wait for 100 ns;
-      wait until (clk = '0');
-      rst <= '0';
+      -- inputs
+      max_cnt : IN  STD_LOGIC_VECTOR (DATA_W - 1 DOWNTO 0);
+      en      : IN  STD_LOGIC;
 
-      wait for 200 ns;
-      wait until (rising_edge(clk));
-      en  <= '1';
-      
-      wait for 300 ns;
-      wait until (rising_edge(clk));
-      mod_int <= 6;
-      wait until (rising_edge(clk));
-      
-      wait for 200 ns;
-      wait until (rising_edge(clk));
-      en <= '0';
-      wait for 150 ns;
-      wait until (rising_edge(clk));
-      en <= '1';
-      
-      wait for 200 ns;
-      wait until (rising_edge(clk));
-      mod_int <= 21;
-      wait until (rising_edge(clk));
-      
-      wait for 300 ns;
-      endSim  <= true;
-   end process; 
-      
-   -- End the simulation
-   process 
-   begin
-      if (endSim) then
-         assert false 
-            report "End of simulation." 
-            severity failure; 
-      end if;
-      wait until (rising_edge(clk));
-   end process;   
+      -- outputs
+      zero    : OUT STD_LOGIC
+    );
+  END COMPONENT;
+BEGIN
+  clk <= NOT clk AFTER clk_period/2;
+  modulo <= STD_LOGIC_VECTOR(to_unsigned(mod_int, modulo'length));
 
-   modulo_cnt_i : modulo_cnt
-   generic map (
-      DATA_W   => DATA_W
-   )
-   port map (
-      clk      => clk,
-      rst      => rst,
-      
-      max_cnt  => modulo,
-      en       => en,
-      
-      zero     => open
-   );
+  -- Main simulation process
+  PROCESS
+  BEGIN
 
-end architecture;
+    mod_int <= 12;
+    WAIT FOR 100 ns;
+    WAIT UNTIL (clk = '0');
+    rst <= '0';
+
+    WAIT FOR 200 ns;
+    WAIT UNTIL (rising_edge(clk));
+    en <= '1';
+
+    WAIT FOR 300 ns;
+    WAIT UNTIL (rising_edge(clk));
+    mod_int <= 6;
+    WAIT UNTIL (rising_edge(clk));
+
+    WAIT FOR 180 ns;
+    WAIT UNTIL (rising_edge(clk));
+    en <= '0';
+    WAIT FOR 150 ns;
+    WAIT UNTIL (rising_edge(clk));
+    en <= '1';
+
+    WAIT FOR 200 ns;
+    WAIT UNTIL (rising_edge(clk));
+    mod_int <= 21;
+    WAIT UNTIL (rising_edge(clk));
+
+    WAIT FOR 300 ns;
+    endSim <= true;
+  END PROCESS;
+
+  -- End the simulation
+  PROCESS
+  BEGIN
+    IF (endSim) THEN
+      ASSERT false
+      REPORT "End of simulation."
+        SEVERITY failure;
+    END IF;
+    WAIT UNTIL (rising_edge(clk));
+  END PROCESS;
+
+  modulo_cnt_i : modulo_cnt
+  PORT MAP(
+    clk     => clk,
+    rst     => rst,
+
+    max_cnt => modulo,
+    en      => en,
+
+    zero    => OPEN
+  );
+
+END ARCHITECTURE;
