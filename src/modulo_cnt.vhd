@@ -29,16 +29,13 @@ ENTITY modulo_cnt IS
 END modulo_cnt;
 ARCHITECTURE rtl OF modulo_cnt IS
   SIGNAL cnt : unsigned(max_cnt'left DOWNTO 0);
-  SIGNAL zero_i : STD_LOGIC;
 
 BEGIN
-  -- zero_i <= '1' when cnt = 0 else '0'; 
-
   counter_pr : PROCESS (clk)
   BEGIN
     IF (rising_edge(clk)) THEN
       IF (rst = '1') THEN
-        cnt <= unsigned(max_cnt) - 1;
+        cnt  <= unsigned(max_cnt) - 1;
         zero <= '0';
       ELSIF (en = '1') THEN             -- is counting enabled?
         IF (cnt = 1) THEN               -- Use pipeline to assert zero
