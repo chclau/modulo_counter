@@ -1,55 +1,58 @@
-------------------------------------------------------------------
+-------------------------------------------------------------------
 -- Name        : modulo_cnt.vhd
--- Description : Modulo counter
--- Designed by : Claudio Avi Chami - FPGA'er website
+-- Description : modulo counter
+-- Designed by : Claudio Avi Chami - fpga'er website
 --               http://fpgaer.tech
--- Date        : 24/September/2022
--- Version     : 03
+-- Date        : 24/september/2022
+-- Version     : 04
 -- 
--- History     : 01- Initial version
---             : 02- Recoded according Xilinx recommendations
---             : 03- Simplified using recommendations given on Reddit
+-- History     : 01- initial version
+--             : 02- recoded according xilinx recommendations
+--             : 03- simplified using recommendations given on reddit
+--             : 04- added normalization to unconstrained ports
 ------------------------------------------------------------------
-LIBRARY ieee;
-USE ieee.std_logic_1164.ALL;
-USE ieee.numeric_std.ALL;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
-ENTITY modulo_cnt IS
-  PORT (
-    clk     : IN  STD_LOGIC;
-    rst     : IN  STD_LOGIC;
+entity modulo_cnt is
+  port (
+    clk     : in  std_logic;
+    rst     : in  std_logic;
 
     -- inputs
-    max_cnt : IN  STD_LOGIC_VECTOR;
-    en      : IN  STD_LOGIC;
+    max_cnt : in  std_logic_vector;
+    en      : in  std_logic;
 
     -- outputs
-    zero    : OUT STD_LOGIC
+    zero    : out std_logic
   );
-END modulo_cnt;
-ARCHITECTURE rtl OF modulo_cnt IS
-  SIGNAL cnt : unsigned(max_cnt'left DOWNTO 0);
+end modulo_cnt;
+architecture rtl of modulo_cnt is
+  -- normalize the unconstrained input
+  alias max_cnt_norm : std_logic_vector(max_cnt'length - 1 downto 0) is max_cnt; -- normalized unconstrained input
+  signal cnt : unsigned(max_cnt_norm'left downto 0);
 
-BEGIN
-  counter_pr : PROCESS (clk)
-  BEGIN
-    IF (rising_edge(clk)) THEN
-      IF (rst = '1') THEN
-        cnt  <= unsigned(max_cnt) - 1;
+begin
+  counter_pr : process (clk)
+  begin
+    if (rising_edge(clk)) then
+      if (rst = '1') then
+        cnt <= unsigned(max_cnt_norm) - 1;
         zero <= '0';
-      ELSIF (en = '1') THEN             -- is counting enabled?
-        IF (cnt = 1) THEN               -- Use pipeline to assert zero
-          zero <= '1';                  -- together with cnt=0
-        ELSE
+      elsif (en = '1') then -- is counting enabled?
+        if (cnt = 1) then -- use pipeline to assert zero
+          zero <= '1'; -- together with cnt=0
+        else
           zero <= '0';
-        END IF;
-        IF (zero = '1') THEN            -- check if counter reached zero
-          cnt <= unsigned(max_cnt) - 1; -- reload with modulo_value-1
-        ELSE
-          cnt <= cnt - 1;               -- decrement counter
-        END IF;
-      END IF;
-    END IF;
-  END PROCESS counter_pr;
+        end if;
+        if (zero = '1') then -- check if counter reached zero
+          cnt <= unsigned(max_cnt_norm) - 1; -- reload with modulo_value-1
+        else
+          cnt <= cnt - 1; -- decrement counter
+        end if;
+      end if;
+    end if;
+  end process counter_pr;
 
-END rtl;
+end rtl;
